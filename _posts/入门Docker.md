@@ -1,0 +1,1284 @@
+# 	docker 安装
+
+## 查看配置
+
+> `uname -r`
+
+```shell
+# 查看系统内核版本
+uname -r
+>>>>>>>>>>>>>>>>>>>>>
+3.10.0-957.el7.x86_64
+```
+
+> `cat /etc/os-release`
+
+```shell
+# 查看系统配置
+cat /etc/os-release 
+>>>>>>>>>>>>>>>>>>>>
+NAME="CentOS Linux"
+VERSION="7 (Core)"
+ID="centos"
+ID_LIKE="rhel fedora"
+VERSION_ID="7"
+PRETTY_NAME="CentOS Linux 7 (Core)"
+ANSI_COLOR="0;31"
+CPE_NAME="cpe:/o:centos:centos:7"
+HOME_URL="https://www.centos.org/"
+BUG_REPORT_URL="https://bugs.centos.org/"
+
+CENTOS_MANTISBT_PROJECT="CentOS-7"
+CENTOS_MANTISBT_PROJECT_VERSION="7"
+REDHAT_SUPPORT_PRODUCT="centos"
+REDHAT_SUPPORT_PRODUCT_VERSION="7"
+```
+
+## 安装 docker
+
+[docker官方文档](https://docs.docker.com/engine/install/centos/)
+
+```shell
+# 1.卸载 docker
+yum remove docker \
+                  docker-client \
+                  docker-client-latest \
+                  docker-common \
+                  docker-latest \
+                  docker-latest-logrotate \
+                  docker-logrotate \
+                  docker-engine
+# 2.安装 yum-utils
+yum install -y yum-utils
+# 3.使用 yum-utils 提供的 yum-config-manager 安装仓库
+yum-config-manager \
+    --add-repo \
+    http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo # 换成阿里云镜像
+# 4.更新 yum 软件包索引
+yum makecache fast
+# 5.Install Docker Engine
+# docker-ce 社区版，ee 企业版
+yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+#	6.Start Docker
+systemctl start docker
+# 7.查看 docker 版本
+docker version
+# 8.Verify Docker Engine
+docker run hello-world
+# 9.查看镜像
+docker images
+```
+
+## 卸载 docker
+
+```shell
+# 卸载软件
+yum remove docker-ce docker-ce-cli containerd.io docker-compose-plugin
+# 删除资源
+rm -rf /var/lib/docker # docker 默认工作路径
+rm -rf /var/lib/containerd
+```
+
+## 阿里云镜像加速
+
+```shell
+# 配置镜像加速器
+sudo mkdir -p /etc/docker
+
+sudo tee /etc/docker/daemon.json <<-'EOF'
+{
+  "registry-mirrors": ["https://42tmu6xg.mirror.aliyuncs.com"]
+}
+EOF
+
+sudo systemctl daemon-reload
+
+sudo systemctl restart docker
+```
+
+## docker运行原理图
+
+![image-20220702154923301](安装docker.assets/image-20220702154923301.png)
+
+# docker 常用命令
+
+![image-20220703165347577](安装docker.assets/image-20220703165347577.png)
+
+## 帮助命令
+
+[命令帮助文档](https://docs.docker.com/engine/reference/commandline/images/)
+
+### `docker 命令 --help`
+
+> 命令帮助
+>
+
+```shell
+[root@redis ~]# docker --help
+
+Usage:  docker [OPTIONS] COMMAND
+
+A self-sufficient runtime for containers
+
+Options:
+      --config string      Location of client config files (default "/root/.docker")
+  -c, --context string     Name of the context to use to connect to the daemon (overrides
+                           DOCKER_HOST env var and default context set with "docker context use")
+  -D, --debug              Enable debug mode
+  -H, --host list          Daemon socket(s) to connect to
+  -l, --log-level string   Set the logging level ("debug"|"info"|"warn"|"error"|"fatal") (default
+                           "info")
+      --tls                Use TLS; implied by --tlsverify
+      --tlscacert string   Trust certs signed only by this CA (default "/root/.docker/ca.pem")
+      --tlscert string     Path to TLS certificate file (default "/root/.docker/cert.pem")
+      --tlskey string      Path to TLS key file (default "/root/.docker/key.pem")
+      --tlsverify          Use TLS and verify the remote
+  -v, --version            Print version information and quit
+
+Management Commands:
+  app*        Docker App (Docker Inc., v0.9.1-beta3)
+  builder     Manage builds
+  buildx*     Docker Buildx (Docker Inc., v0.8.2-docker)
+  compose*    Docker Compose (Docker Inc., v2.6.0)
+  config      Manage Docker configs
+  container   Manage containers
+  context     Manage contexts
+  image       Manage images
+  manifest    Manage Docker image manifests and manifest lists
+  network     Manage networks
+  node        Manage Swarm nodes
+  plugin      Manage plugins
+  scan*       Docker Scan (Docker Inc., v0.17.0)
+  secret      Manage Docker secrets
+  service     Manage services
+  stack       Manage Docker stacks
+  swarm       Manage Swarm
+  system      Manage Docker
+  trust       Manage trust on Docker images
+  volume      Manage volumes
+
+Commands:
+  attach      Attach local standard input, output, and error streams to a running container
+  build       Build an image from a Dockerfile
+  commit      Create a new image from a container's changes
+  cp          Copy files/folders between a container and the local filesystem
+  create      Create a new container
+  diff        Inspect changes to files or directories on a container's filesystem
+  events      Get real time events from the server
+  exec        Run a command in a running container
+  export      Export a container's filesystem as a tar archive
+  history     Show the history of an image
+  images      List images
+  import      Import the contents from a tarball to create a filesystem image
+  info        Display system-wide information
+  inspect     Return low-level information on Docker objects
+  kill        Kill one or more running containers
+  load        Load an image from a tar archive or STDIN
+  login       Log in to a Docker registry
+  logout      Log out from a Docker registry
+  logs        Fetch the logs of a container
+  pause       Pause all processes within one or more containers
+  port        List port mappings or a specific mapping for the container
+  ps          List containers
+  pull        Pull an image or a repository from a registry
+  push        Push an image or a repository to a registry
+  rename      Rename a container
+  restart     Restart one or more containers
+  rm          Remove one or more containers
+  rmi         Remove one or more images
+  run         Run a command in a new container
+  save        Save one or more images to a tar archive (streamed to STDOUT by default)
+  search      Search the Docker Hub for images
+  start       Start one or more stopped containers
+  stats       Display a live stream of container(s) resource usage statistics
+  stop        Stop one or more running containers
+  tag         Create a tag TARGET_IMAGE that refers to SOURCE_IMAGE
+  top         Display the running processes of a container
+  unpause     Unpause all processes within one or more containers
+  update      Update configuration of one or more containers
+  version     Show the Docker version information
+  wait        Block until one or more containers stop, then print their exit codes
+
+Run 'docker COMMAND --help' for more information on a command.
+
+To get more help with docker, check out our guides at https://docs.docker.com/go/guides/
+```
+
+### `docker version`
+
+> 显示 docker 版本信息
+
+```shell
+[root@redis ~]# docker version 
+Client: Docker Engine - Community
+ Version:           20.10.17
+ API version:       1.41
+ Go version:        go1.17.11
+ Git commit:        100c701
+ Built:             Mon Jun  6 23:05:12 2022
+ OS/Arch:           linux/amd64
+ Context:           default
+ Experimental:      true
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          20.10.17
+  API version:      1.41 (minimum version 1.12)
+  Go version:       go1.17.11
+  Git commit:       a89b842
+  Built:            Mon Jun  6 23:03:33 2022
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.6.6
+  GitCommit:        10c12954828e7c7c9b6e0ea9b0c02b01407d3ae1
+ runc:
+  Version:          1.1.2
+  GitCommit:        v1.1.2-0-ga916309
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+```
+
+### `docker info`
+
+> 显示 docker 的系统信息
+>
+
+```shell
+[root@redis ~]# docker info
+Client:
+ Context:    default
+ Debug Mode: false
+ Plugins:
+  app: Docker App (Docker Inc., v0.9.1-beta3)
+  buildx: Docker Buildx (Docker Inc., v0.8.2-docker)
+  compose: Docker Compose (Docker Inc., v2.6.0)
+  scan: Docker Scan (Docker Inc., v0.17.0)
+
+Server:
+ Containers: 1
+  Running: 0
+  Paused: 0
+  Stopped: 1
+ Images: 1
+ Server Version: 20.10.17
+ Storage Driver: overlay2
+  Backing Filesystem: extfs
+  Supports d_type: true
+  Native Overlay Diff: true
+  userxattr: false
+ Logging Driver: json-file
+ Cgroup Driver: cgroupfs
+ Cgroup Version: 1
+ Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+  Log: awslogs fluentd gcplogs gelf journald json-file local logentries splunk syslog
+ Swarm: inactive
+ Runtimes: io.containerd.runtime.v1.linux runc io.containerd.runc.v2
+ Default Runtime: runc
+ Init Binary: docker-init
+ containerd version: 10c12954828e7c7c9b6e0ea9b0c02b01407d3ae1
+ runc version: v1.1.2-0-ga916309
+ init version: de40ad0
+ Security Options:
+  seccomp
+   Profile: default
+ Kernel Version: 3.10.0-957.el7.x86_64
+ Operating System: CentOS Linux 7 (Core)
+ OSType: linux
+ Architecture: x86_64
+ CPUs: 4
+ Total Memory: 3.683GiB
+ Name: redis
+ ID: LW2E:MDQU:B2CX:4UAH:6MAT:6CXO:V4O6:3UAN:TKUB:LYWE:MQWZ:6PGM
+ Docker Root Dir: /var/lib/docker
+ Debug Mode: false
+ Registry: https://index.docker.io/v1/
+ Labels:
+ Experimental: false
+ Insecure Registries:
+  127.0.0.0/8
+ Registry Mirrors:
+  https://42tmu6xg.mirror.aliyuncs.com/
+ Live Restore Enabled: false
+```
+
+## 镜像命令
+
+### `docker images`
+
+> 查看本地主机上所有的镜像
+>
+
+```shell
+[root@redis ~]# docker images --help
+
+Usage:  docker images [OPTIONS] [REPOSITORY[:TAG]]
+
+List images
+
+Options:
+  -a, --all             Show all images (default hides intermediate images)
+  -q, --quiet           Only show image IDs
+```
+
+```shell
+[root@redis ~]# docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+hello-world   latest    feb5d9fea6a5   9 months ago   13.3kB
+# 字段解释
+REPOSITORY 镜像的仓库名
+TAG				 镜像的标签
+IMAGE ID   镜像的 id
+CREATED		 镜像的创建时间
+SIZE			 镜像的大小
+```
+
+### `docker search`
+
+> 搜索镜像
+>
+
+```shell
+[root@redis ~]# docker search --help
+
+Usage:  docker search [OPTIONS] TERM
+
+Search the Docker Hub for images
+
+Options:
+  -f, --filter filter   Filter output based on conditions provided
+      --format string   Pretty-print search using a Go template
+      --limit int       Max number of search results (default 25)
+      --no-trunc        Don't truncate output
+```
+
+```shell
+[root@redis ~]#  docker search mysql
+NAME                           DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
+mysql                          MySQL is a widely used, open-source relation…   12807     [OK]       		
+mariadb                        MariaDB Server is a high performing open sou…   4913      [OK]       		
+bitnami/mysql                  Bitnami MySQL Docker Image                      71                   [OK]
+      
+# 通过过滤搜藏数搜索
+[root@redis ~]# docker search mysql --filter=STARS=5000 # 搜出结果为搜藏数大于5000的 mysql 镜像
+NAME      DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
+mysql     MySQL is a widely used, open-source relation…   12815     [OK]       													
+```
+
+### `docker pull`
+
+> 下载镜像
+
+```shell
+# docker pull [OPTIONS] NAME[:TAG|@DIGEST]
+```
+
+```shell
+[root@redis ~]# docker pull mysql 	# 等价于 docker pull docker.io/library/mysql:latest
+Using default tag: latest 					# 不指定tag 默认为最新的版本
+latest: Pulling from library/mysql
+# 分层下载 docker image 的核心 联合文件系统
+72a69066d2fe: Pull complete 
+93619dbc5b36: Pull complete 
+99da31dd6142: Pull complete 
+626033c43d70: Pull complete 
+37d5d7efb64e: Pull complete 
+ac563158d721: Pull complete 
+d2ba16033dad: Pull complete 
+688ba7d5c01a: Pull complete 
+00e060b6d11d: Pull complete 
+1c04857f594f: Pull complete 
+4d7cfa90e6ea: Pull complete 
+e0431212d27d: Pull complete 
+Digest: sha256:e9027fe4d91c0153429607251656806cc784e914937271037f7738bd5b8e7709 # 签名
+Status: Downloaded newer image for mysql:latest
+docker.io/library/mysql:latest 			# 真实地址
+
+# 指定版本下载
+[root@redis ~]# docker pull mysql:5.7
+5.7: Pulling from library/mysql
+# 分层下载的特点：共用下载好的层
+72a69066d2fe: Already exists 
+93619dbc5b36: Already exists 
+99da31dd6142: Already exists 
+626033c43d70: Already exists 
+37d5d7efb64e: Already exists 
+ac563158d721: Already exists 
+d2ba16033dad: Already exists 
+0ceb82207cd7: Pull complete 
+37f2405cae96: Pull complete 
+e2482e017e53: Pull complete 
+70deed891d42: Pull complete 
+Digest: sha256:f2ad209efe9c67104167fc609cca6973c8422939491c9345270175a300419f94
+Status: Downloaded newer image for mysql:5.7
+docker.io/library/mysql:5.7
+# 查看一下镜像
+[root@redis ~]# docker images
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+mysql         5.7       c20987f18b13   6 months ago   448MB
+mysql         latest    3218b38490ce   6 months ago   516MB
+hello-world   latest    feb5d9fea6a5   9 months ago   13.3kB
+```
+
+### `docker rmi` 
+
+> 删除镜像
+>
+
+```shell
+[root@redis ~]# docker rmi -f c20987f18b13 # 根据 IMAGE ID 删除;	
+																					 # 删除多个：docker rmi -f IMAGE ID IMAGE ID ...
+Untagged: mysql:5.7
+Untagged: mysql@sha256:f2ad209efe9c67104167fc609cca6973c8422939491c9345270175a300419f94
+Deleted: sha256:c20987f18b130f9d144c9828df630417e2a9523148930dc3963e9d0dab302a76
+Deleted: sha256:6567396b065ee734fb2dbb80c8923324a778426dfd01969f091f1ab2d52c7989
+Deleted: sha256:0910f12649d514b471f1583a16f672ab67e3d29d9833a15dc2df50dd5536e40f
+Deleted: sha256:6682af2fb40555c448b84711c7302d0f86fc716bbe9c7dc7dbd739ef9d757150
+Deleted: sha256:5c062c3ac20f576d24454e74781511a5f96739f289edaadf2de934d06e910b92
+[root@redis ~]# docker images 
+REPOSITORY    TAG       IMAGE ID       CREATED        SIZE
+mysql         latest    3218b38490ce   6 months ago   516MB
+hello-world   latest    feb5d9fea6a5   9 months ago   13.3kB
+# 批量删除
+[root@redis ~]# docker rmi -f $(docker images -qa)
+Untagged: mysql:latest
+Untagged: mysql@sha256:e9027fe4d91c0153429607251656806cc784e914937271037f7738bd5b8e7709
+Deleted: sha256:3218b38490cec8d31976a40b92e09d61377359eab878db49f025e5d464367f3b
+Deleted: sha256:aa81ca46575069829fe1b3c654d9e8feb43b4373932159fe2cad1ac13524a2f5
+Deleted: sha256:0558823b9fbe967ea6d7174999be3cc9250b3423036370dc1a6888168cbd224d
+Deleted: sha256:a46013db1d31231a0e1bac7eeda5ad4786dea0b1773927b45f92ea352a6d7ff9
+Deleted: sha256:af161a47bb22852e9e3caf39f1dcd590b64bb8fae54315f9c2e7dc35b025e4e3
+Deleted: sha256:feff1495e6982a7e91edc59b96ea74fd80e03674d92c7ec8a502b417268822ff
+Deleted: sha256:8805862fcb6ef9deb32d4218e9e6377f35fb351a8be7abafdf1da358b2b287ba
+Deleted: sha256:872d2f24c4c64a6795e86958fde075a273c35c82815f0a5025cce41edfef50c7
+Deleted: sha256:6fdb3143b79e1be7181d32748dd9d4a845056dfe16ee4c827410e0edef5ad3da
+Deleted: sha256:b0527c827c82a8f8f37f706fcb86c420819bb7d707a8de7b664b9ca491c96838
+Deleted: sha256:75147f61f29796d6528486d8b1f9fb5d122709ea35620f8ffcea0e0ad2ab0cd0
+Deleted: sha256:2938c71ddf01643685879bf182b626f0a53b1356138ef73c40496182e84548aa
+Deleted: sha256:ad6b69b549193f81b039a1d478bc896f6e460c77c1849a4374ab95f9a3d2cea2
+Untagged: hello-world:latest
+Untagged: hello-world@sha256:13e367d31ae85359f42d637adf6da428f76d75dc9afeb3c21faea0d976f5c651
+Deleted: sha256:feb5d9fea6a5e9606aa995e879d862b825965ba48de054caab5ef356dc6b3412
+[root@redis ~]# docker images
+REPOSITORY   TAG       IMAGE ID   CREATED   SIZE
+```
+
+## 容器命令
+
+**先有镜像，才可以创建容器**
+
+> 下载 centos 镜像
+>
+
+```shell
+[root@redis ~]# docker pull centos
+Using default tag: latest
+latest: Pulling from library/centos
+a1d0c7532777: Pull complete 
+Digest: sha256:a27fd8080b517143cbbbab9dfb7c8571c40d67d534bbdee55bd6c473f432b177
+Status: Downloaded newer image for centos:latest
+docker.io/library/centos:latest
+```
+
+### `docker run`
+
+> 创建容器并启动容器
+>
+
+```shell
+[root@redis /]# docker run --help
+
+Usage:  docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
+
+Run a command in a new container
+
+Options:
+      --name string                    		 Assign a name to the container
+      --name="名字"
+      -d, --detach                    	   Run container in background and print container ID
+      -it																	 进入容器进行相关操作
+      # -i, --interactive                    Keep STDIN open even if not attached
+      # -t, --tty                            Allocate a pseudo-TTY
+      -p, --publish list                   Publish a container's port(s) to the host # 指定容器端口
+                                           端口形式：
+                                             1.-p ip:主机端口:容器端口
+                                             3.-p 主机端口:容器端口（常用）
+                                             3.-p 容器端口
+                                             4.容器端口
+      -P, --publish-all                    Publish all exposed ports to random ports # 任意端口
+```
+
+> 创建、启动并进入容器
+>
+
+```shell
+[root@redis ~]# docker run -it centos /bin/bash
+[root@f11c07d6548a /]# ls
+bin  dev  etc  home  lib  lib64  lost+found  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+```
+
+### `exit`
+
+### `Ctrl + p + q`
+
+> 退出容器
+>
+
+```shell
+[root@f11c07d6548a /]# exit							 # 直接停止并退出容器
+exit
+[root@redis /]# ls
+bin  boot  data  dev  dump.rdb  etc  home  lib  lib64  lost+found  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+
+[root@f11c07d6548a /]# Ctrl + p + q			 # 快捷键 不停止但退出容器
+# 没有容器在运行
+[root@redis /]# docker ps								 
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+[root@redis /]# docker run -it centos /bin/bash
+[root@f11c07d6548a /]# Ctrl + p + q
+# 容器还在运行
+[root@redis /]# docker ps
+CONTAINER ID   IMAGE     COMMAND       CREATED          STATUS          PORTS     NAMES
+35ba04f558df   centos    "/bin/bash"   12 seconds ago   Up 11 seconds             recursing_sinoussi
+```
+
+### `docker ps`
+
+> 列出所有正在运行的容器
+>
+
+```shell
+[root@redis /]# docker ps 							# 列出所有正在运行的容器
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+[root@redis /]# docker ps -a 						# 列出所有正在运行的容器 + 历史运行过的容器
+CONTAINER ID   IMAGE          COMMAND       CREATED         STATUS                     PORTS     NAMES
+f11c07d6548a   centos         "/bin/bash"   8 minutes ago   Exited (0) 5 minutes ago             exciting_fermat
+fccb22b6c380   feb5d9fea6a5   "/hello"      23 hours ago    Exited (0) 23 hours ago              reverent_morse
+[root@redis /]# docker ps -a -n=1				# 显示最近创建的1个容器
+CONTAINER ID   IMAGE     COMMAND       CREATED          STATUS                     PORTS     NAMES
+f11c07d6548a   centos    "/bin/bash"   12 minutes ago   Exited (0) 9 minutes ago             exciting_fermat
+[root@redis /]# docker ps -aq						# 只显示 CONTAINER ID
+f11c07d6548a
+fccb22b6c380
+```
+
+### `docker rm`
+
+> 删除容器
+>
+
+```shell
+[root@redis /]# docker rm f11c07d6548a						# 只能删除没在运行的容器
+f11c07d6548a
+[root@redis /]# docker rm -f $(docker ps -aq)			# 递归删除所有容器
+35ba04f558df
+fccb22b6c380
+[root@redis /]# docker ps -aq | xargs docker rm		# 管道符删除所有容器
+```
+
+### `docker start` 
+
+> 启动容器
+
+### `docker restart`
+
+> 重启容器
+
+### `docker stop` 
+
+> 停止容器
+
+### `docker kill`
+
+>  强制停止容器
+
+```shell
+[root@redis /]# docker ps -a
+CONTAINER ID   IMAGE     COMMAND       CREATED          STATUS                      PORTS     NAMES
+40e2dcfc67c4   centos    "/bin/bash"   15 seconds ago   Exited (0) 12 seconds ago             quirky_albattani
+[root@redis /]# docker start 40e2dcfc67c4  # 40e2dcfc67c4：CONTAINER ID
+40e2dcfc67c4
+[root@redis /]# docker ps -a
+CONTAINER ID   IMAGE     COMMAND       CREATED          STATUS         PORTS     NAMES
+40e2dcfc67c4   centos    "/bin/bash"   44 seconds ago   Up 2 seconds             quirky_albattani
+[root@redis /]# docker stop 40e2dcfc67c4	 # 40e2dcfc67c4：CONTAINER ID
+40e2dcfc67c4
+[root@redis /]# docker ps -a
+CONTAINER ID   IMAGE     COMMAND       CREATED          STATUS                     PORTS     NAMES
+40e2dcfc67c4   centos    "/bin/bash"   58 seconds ago   Exited (0) 2 seconds ago             quirky_albattani
+```
+
+## 其他常用命令
+
+### `docker run -d`
+
+> 后台启动容器
+>
+
+```shell
+[root@redis /]# docker run -d centos
+42fb080570c71c3ca903713ff49c427b1fa24ec058e65866cc9f0b81bcd549e1
+[root@redis /]# docker ps -a
+CONTAINER ID   IMAGE     COMMAND       CREATED         STATUS                    PORTS     NAMES
+42fb080570c7   centos    "/bin/bash"   2 seconds ago   Exited (0) 1 second ago             funny_shtern
+# 坑：后台启动如果没有前台进程，也就是没有应用运行，容器会自动停止
+```
+
+### `docker logs`
+
+> 查看日志
+
+```shell
+[root@redis /]# docker logs --help
+
+Usage:  docker logs [OPTIONS] CONTAINER
+
+Fetch the logs of a container
+
+Options:
+      --details        Show extra details provided to logs
+  -f, --follow         Follow log output
+      --since string   Show logs since timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
+  -n, --tail string    Number of lines to show from the end of the logs (default "all")
+  -t, --timestamps     Show timestamps
+      --until string   Show logs before a timestamp (e.g. 2013-01-02T13:23:37Z) or relative (e.g. 42m for 42 minutes)
+```
+
+```shell
+[root@redis /]# docker run -d centos /bin/bash -c "while true;do echo bylv;sleep 2;done"
+																						 # -c “脚本”：运行一段脚本
+d3841c9f3da2496867c288c07bd31094d1e9069ef6c610988586ac93ff7f64a9
+[root@redis /]# docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS         PORTS     NAMES
+d3841c9f3da2   centos    "/bin/bash -c 'while…"   3 seconds ago   Up 2 seconds             wonderful_driscoll
+[root@redis /]# docker logs -f -t --tail 10 d3841c9f3da2
+2022-07-03T07:50:08.192244300Z bylv
+2022-07-03T07:50:10.194505318Z bylv
+2022-07-03T07:50:12.196945767Z bylv
+2022-07-03T07:50:14.200342865Z bylv
+2022-07-03T07:50:16.204369033Z bylv
+2022-07-03T07:50:18.207762665Z bylv
+2022-07-03T07:50:20.210733684Z bylv
+2022-07-03T07:50:22.213842057Z bylv
+2022-07-03T07:50:24.216833733Z bylv
+2022-07-03T07:50:26.219025341Z bylv
+```
+
+### `docker top 容器id`
+
+> 查看容器中的进程信息
+
+```shell
+[root@redis /]# docker top d3841c9f3da2
+UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
+root                26420               26400               0                   15:47               ?                   00:00:00            /bin/bash -c while true;do echo bylv;sleep 2;done
+root                27016               26420               0                   15:57               ?                   00:00:00            /usr/bin/coreutils --coreutils-prog-shebang=sleep /usr/bin/sleep 2
+```
+
+### `docker inspect 容器id`
+
+> 查看镜像的元数据
+
+```shell
+[root@redis /]# docker inspect --help
+
+Usage:  docker inspect [OPTIONS] NAME|ID [NAME|ID...]
+
+Return low-level information on Docker objects
+
+Options:
+  -f, --format string   Format the output using the given Go template
+  -s, --size            Display total file sizes if the type is container
+      --type string     Return JSON for specified type
+```
+
+```shell
+[root@redis /]# docker inspect d3841c9f3da2
+[
+    {
+        "Id": "d3841c9f3da2496867c288c07bd31094d1e9069ef6c610988586ac93ff7f64a9",
+        "Created": "2022-07-03T07:47:33.107673736Z",
+        "Path": "/bin/bash",
+        "Args": [
+            "-c",
+            "while true;do echo bylv;sleep 2;done"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 26420,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2022-07-03T07:47:33.843313332Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:5d0da3dc976460b72c77d94c8a1ad043720b0416bfc16c52c45d4847e53fadb6",
+        "ResolvConfPath": "/var/lib/docker/containers/d3841c9f3da2496867c288c07bd31094d1e9069ef6c610988586ac93ff7f64a9/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/d3841c9f3da2496867c288c07bd31094d1e9069ef6c610988586ac93ff7f64a9/hostname",
+        "HostsPath": "/var/lib/docker/containers/d3841c9f3da2496867c288c07bd31094d1e9069ef6c610988586ac93ff7f64a9/hosts",
+        "LogPath": "/var/lib/docker/containers/d3841c9f3da2496867c288c07bd31094d1e9069ef6c610988586ac93ff7f64a9/d3841c9f3da2496867c288c07bd31094d1e9069ef6c610988586ac93ff7f64a9-json.log",
+        "Name": "/wonderful_driscoll",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "host",
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "KernelMemory": 0,
+            "KernelMemoryTCP": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/78b251897e4d1f26a1c64ecf56cfa20fa3b5fc54201a7424ddb926031e9d1682-init/diff:/var/lib/docker/overlay2/090a6913b9b300cdf7d5801b60f510895bcd3d25fe1d73085d92173a126027ff/diff",
+                "MergedDir": "/var/lib/docker/overlay2/78b251897e4d1f26a1c64ecf56cfa20fa3b5fc54201a7424ddb926031e9d1682/merged",
+                "UpperDir": "/var/lib/docker/overlay2/78b251897e4d1f26a1c64ecf56cfa20fa3b5fc54201a7424ddb926031e9d1682/diff",
+                "WorkDir": "/var/lib/docker/overlay2/78b251897e4d1f26a1c64ecf56cfa20fa3b5fc54201a7424ddb926031e9d1682/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [],
+        "Config": {
+            "Hostname": "d3841c9f3da2",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+            ],
+            "Cmd": [
+                "/bin/bash",
+                "-c",
+                "while true;do echo bylv;sleep 2;done"
+            ],
+            "Image": "centos",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": null,
+            "OnBuild": null,
+            "Labels": {
+                "org.label-schema.build-date": "20210915",
+                "org.label-schema.license": "GPLv2",
+                "org.label-schema.name": "CentOS Base Image",
+                "org.label-schema.schema-version": "1.0",
+                "org.label-schema.vendor": "CentOS"
+            }
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "0ea18b1c36be46003c435df8a99734d8a14f33871121869766d12c663c2060d5",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {},
+            "SandboxKey": "/var/run/docker/netns/0ea18b1c36be",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "e581fa94d275d4106d97f636bf1d8a23f5c58bfad261c1b67fe0123da5ebd9de",
+            "Gateway": "172.17.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.17.0.2",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "MacAddress": "02:42:ac:11:00:02",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "578336e01ba945ebc0ad6a619850b6a14586c47b18b7eec51d05842da68d5b8f",
+                    "EndpointID": "e581fa94d275d4106d97f636bf1d8a23f5c58bfad261c1b67fe0123da5ebd9de",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:02",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]
+
+```
+
+### `docker exec`
+
+> 以开启新终端的方式进入正在运行的容器，可以操作命令
+
+```shell
+[root@redis /]# docker exec --help
+
+Usage:  docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
+
+Run a command in a running container
+
+Options:
+  -d, --detach               Detached mode: run command in the background
+      --detach-keys string   Override the key sequence for detaching a container
+  -e, --env list             Set environment variables
+      --env-file list        Read in a file of environment variables
+  -i, --interactive          Keep STDIN open even if not attached
+      --privileged           Give extended privileges to the command
+  -t, --tty                  Allocate a pseudo-TTY
+  -u, --user string          Username or UID (format: <name|uid>[:<group|gid>])
+  -w, --workdir string       Working directory inside the container
+```
+
+```shell
+[root@redis /]# docker exec -it d3841c9f3da2 /bin/bash   
+[root@d3841c9f3da2 /]# 
+```
+
+### `docker attach`
+
+> 不开启终端，进入正在执行的终端
+
+```shell
+[root@redis /]# docker attach --help 
+
+Usage:  docker attach [OPTIONS] CONTAINER
+
+Attach local standard input, output, and error streams to a running container
+
+Options:
+      --detach-keys string   Override the key sequence for detaching a container
+      --no-stdin             Do not attach STDIN
+      --sig-proxy            Proxy all received signals to the process (default true)
+```
+
+```shell
+[root@redis /]# docker attach d3841c9f3da2			
+```
+
+### `docker cp`
+
+> 拷贝容器内的文件到主机
+
+```shell
+[root@redis home]# docker cp --help 
+
+Usage:  docker cp [OPTIONS] CONTAINER:SRC_PATH DEST_PATH|-
+				docker cp [OPTIONS] SRC_PATH|- CONTAINER:DEST_PATH
+
+Copy files/folders between a container and the local filesystem
+
+Use '-' as the source to read a tar archive from stdin
+and extract it to a directory destination in a container.
+Use '-' as the destination to stream a tar archive of a
+container source to stdout.
+
+Options:
+  -a, --archive       Archive mode (copy all uid/gid information)
+  -L, --follow-link   Always follow symbol link in SRC_PATH
+```
+
+```shell
+[root@8ba3a6929eb7 /]# cd /home
+[root@8ba3a6929eb7 home]# touch bylv.java
+[root@8ba3a6929eb7 home]# ls
+bylv.java
+[root@8ba3a6929eb7 home]# exit
+exit
+[root@redis /]# docker cp 8ba3a6929eb7:/home/bylv.java /home 
+[root@redis /]# cd /home
+[root@redis home]# ls
+bylv.java
+```
+
+### docker stats
+
+> 查看CPU内存状态
+
+```shell
+[root@redis ~]# docker stats
+CONTAINER ID   NAME            CPU %     MEM USAGE / LIMIT     MEM %     NET I/O         BLOCK I/O        PIDS
+d083562bd707   elasticsearch   0.19%     1.205GiB / 3.683GiB   32.71%    1.18kB / 942B   4.06MB / 696kB   46
+```
+
+
+
+# 部署Nginx
+
+> 下载镜像
+
+```shell
+[root@redis ~]# systemctl start docker			# 启动 docker
+[root@redis ~]# docker search nginx					# 搜索 Nginx 镜像
+NAME                                              DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
+nginx                                             Official build of Nginx.                        17036     [OK]       
+linuxserver/nginx                                 An Nginx container, brought to you by LinuxS…   169                  
+bitnami/nginx                                     Bitnami nginx Docker Image                      133                  [OK]
+[root@redis ~]# docker pull nginx						# 下载 Nginx 镜像
+Using default tag: latest
+latest: Pulling from library/nginx
+a2abf6c4d29d: Pull complete 
+a9edb18cadd1: Pull complete 
+589b7251471a: Pull complete 
+186b1aaa4aa6: Pull complete 
+b4df32aa5a72: Pull complete 
+a0bcbecc962e: Pull complete 
+Digest: sha256:0d17b565c37bcbd895e9d92315a05c1c3c9a29f762b011a10c54a66cd53c9b31
+Status: Downloaded newer image for nginx:latest
+docker.io/library/nginx:latest
+[root@redis ~]# docker images 							# 查看下载的镜像
+REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+nginx        latest    605c77e624dd   6 months ago   141MB
+centos       latest    5d0da3dc9764   9 months ago   231MB
+```
+
+> 创建容器并后台运行
+
+```shell
+[root@redis ~]# docker run -d --name nginx01 -p 3344:80 nginx
+fbe14d1c086084b0e8ef0cab4de45b5da95d759b88f977b45ad6b14303df3e24
+[root@redis ~]# docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED         STATUS         PORTS                                                 NAMES
+fbe14d1c0860   nginx     "/docker-entrypoint.…"   7 seconds ago   Up 4 seconds   80/tcp, 0.0.0.0:49153->3344/tcp, :::49153->3344/tcp   nginx01
+```
+
+**端口暴露原理图**
+
+<img src="Docker.assets/image-20220704180936321.png" alt="image-20220704180936321" style="zoom: 67%;" />
+
+> 本机访问 Nginx 测试
+
+```shell
+[root@redis ~]# curl localhost:3344
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+```
+
+# 部署Tomcat
+
+> `--rm` 用来测试，表示用完即删
+
+```shell
+docker run -it --rm tomcat:9.0     				# 官方提供
+```
+
+> 下载 Tomcat 镜像
+
+```shell
+[root@redis ~]# docker pull tomcat:9.0
+9.0: Pulling from library/tomcat
+Digest: sha256:cd96d4f7d3f5fc4d3bc1622ec678207087b8215d55021a607ecaefba80b403ea
+Status: Image is up to date for tomcat:9.0
+docker.io/library/tomcat:9.0
+[root@redis ~]# docker images
+REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+nginx        latest    605c77e624dd   6 months ago   141MB
+tomcat       9.0       b8e65a4d736d   6 months ago   680MB
+centos       latest    5d0da3dc9764   9 months ago   231MB
+```
+
+> 创建 Tomcat 容器
+
+```shell
+[root@redis ~]# docker run -d -p 3355:8080 --name tomcat01 tomcat
+71a18ea7e6aafeabd97b9bf193a648d38e5662ff98154e8f5adb0ee09ec61dba
+[root@redis ~]# docker ps
+CONTAINER ID   IMAGE     COMMAND             CREATED         STATUS         PORTS                                       NAMES
+71a18ea7e6aa   tomcat    "catalina.sh run"   6 seconds ago   Up 5 seconds   0.0.0.0:3355->8080/tcp, :::3355->8080/tcp   tomcat01
+```
+
+> 访问  Tomcat 测试
+
+<img src="Docker.assets/image-20220704184958919.png" alt="image-20220704184958919"  />
+
+**原因：**
+
+```shell
+[root@redis ~]# docker exec -it tomcat01 /bin/bash
+root@71a18ea7e6aa:/usr/local/tomcat# cd webapps
+root@71a18ea7e6aa:/usr/local/tomcat/webapps# ls
+root@71a18ea7e6aa:/usr/local/tomcat/webapps# 
+```
+
+​		阿里镜像默认是最小镜像，只保留了必要的东西，所以里面Linux有些命令无法使用，Tomcat里的webapps文件夹是空的。
+
+> tomcat 输出文件夹 webapps.dist 里面有 ROOT相关文件
+
+```shell
+root@71a18ea7e6aa:/usr/local/tomcat# cd webapps.dist/
+root@71a18ea7e6aa:/usr/local/tomcat/webapps.dist# ls
+ROOT  docs  examples  host-manager  manager
+```
+
+> 拷贝到 webapps
+
+```shell
+root@71a18ea7e6aa:/usr/local/tomcat# cp -r webapps.dist//* webapps
+```
+
+>  访问 Tomcat 成功
+
+![image-20220704190356625](Docker.assets/image-20220704190356625.png)
+
+# 部署 elasticsearch + kibana
+
+> 下载、创建并启动 elasticsearch 
+>
+> `--net somenetwork `网络配置
+
+```shell
+[root@redis ~]# docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:7.6.2
+[root@redis ~]# docker ps
+CONTAINER ID   IMAGE                 COMMAND                  CREATED          STATUS          PORTS                                                                                  NAMES
+d083562bd707   elasticsearch:7.6.2   "/usr/local/bin/dock…"   39 seconds ago   Up 36 seconds   0.0.0.0:9200->9200/tcp, :::9200->9200/tcp, 0.0.0.0:9300->9300/tcp, :::9300->9300/tcp   elasticsearch
+```
+
+> 访问 elasticsearch 测试
+
+```shell
+[root@redis ~]# curl localhost:9200
+{
+  "name" : "d083562bd707",
+  "cluster_name" : "docker-cluster",
+  "cluster_uuid" : "CoCsxmiJTpa1MvxOK1wP8A",
+  "version" : {
+    "number" : "7.6.2",
+    "build_flavor" : "default",
+    "build_type" : "docker",
+    "build_hash" : "ef48eb35cf30adf4db14086e8aabd07ef6fb113f",
+    "build_date" : "2020-03-26T06:34:37.794943Z",
+    "build_snapshot" : false,
+    "lucene_version" : "8.4.0",
+    "minimum_wire_compatibility_version" : "6.8.0",
+    "minimum_index_compatibility_version" : "6.0.0-beta1"
+  },
+  "tagline" : "You Know, for Search"
+}
+```
+
+> 查看CPU内存状态
+
+```shell
+[root@redis ~]# docker stats
+CONTAINER ID   NAME            CPU %     MEM USAGE / LIMIT     MEM %     NET I/O         BLOCK I/O        PIDS
+d083562bd707   elasticsearch   0.19%     1.205GiB / 3.683GiB   32.71%    1.18kB / 942B   4.06MB / 696kB   46
+```
+
+> 限制内存大小
+>
+> `-e`环境配置
+
+```shell
+[root@redis ~]# docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e ES_JAVA_OPTS="-Xms64m -Xmx512m" elasticsearch:7.6.2
+[root@redis ~]# docker stats
+CONTAINER ID   NAME              CPU %     MEM USAGE / LIMIT     MEM %     NET I/O     BLOCK I/O    PIDS
+c8d602638ad1   elasticsearch02   0.48%     382.4MiB / 3.683GiB   10.14%    656B / 0B   0B / 696kB   46
+```
+
+**kibana 访问 elasticsearch 原理图**
+
+![image-20220704194436289](Docker.assets/image-20220704194436289.png)
+
+# 可视化管理工具
+
+## Portainer
+
+### 安装
+
+[官方文档](https://docs.portainer.io/start/install/server/docker/linux)
+
+1. > Create the volume that Portainer Server will use to store its database.
+
+```shell
+[root@redis ~]# systemctl start docker
+[root@redis ~]# docker volume create portainer_data
+portainer_data
+```
+
+2. > Download and install the Portainer Server container.
+
+```shell
+[root@redis ~]# docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
+Unable to find image 'portainer/portainer-ce:latest' locally
+latest: Pulling from portainer/portainer-ce
+0ea73420e2bb: Pull complete 
+c367f59be2e1: Pull complete 
+b71b88d796e2: Pull complete 
+Digest: sha256:4f126c5114b63e9d1bceb4b368944d14323329a9a0d4e7bb7eb53c9b7435d498
+Status: Downloaded newer image for portainer/portainer-ce:latest
+be49808d8001c4811ec42a316936a95476ee1a0e3c8eb28f9b967d963c45f500
+[root@redis ~]# docker ps
+CONTAINER ID   IMAGE                           COMMAND        CREATED         STATUS         PORTS                                                                                            NAMES
+be49808d8001   portainer/portainer-ce:latest   "/portainer"   4 minutes ago   Up 4 minutes   0.0.0.0:8000->8000/tcp, :::8000->8000/tcp, 0.0.0.0:9443->9443/tcp, :::9443->9443/tcp, 9000/tcp   portainer
+```
+
+3. > 本机访问测试
+
+```shell
+# If you'd like to turn off curl's verification of the certificate, use the -k (or --insecure) option.
+[root@redis ~]# curl -k https://192.168.200.129:9443/
+<!DOCTYPE html
+><html lang="en" ng-app="portainer" ng-strict-di>
+  <head>
+    <meta charset="utf-8" />
+    <title>Portainer</title>
+    <meta name="description" content="" />
+```
+
+
+
+### 登录面板
+
+浏览器访问：https://localhost:9443
+
+# docker 镜像
+
+## commit 镜像
+
+> 提交自己的一个镜像
+
+```shell
+[root@redis ~]# docker run -it -p 8080:8080 --name tomcat01 tomcat  # COMMAND 默认为catalina.sh run
+Using CATALINA_BASE:   /usr/local/tomcat
+Using CATALINA_HOME:   /usr/local/tomcat
+Using CATALINA_TMPDIR: /usr/local/tomcat/temp
+Using JRE_HOME:        /usr/local/openjdk-11
+Using CLASSPATH:       /usr/local/tomcat/bin/bootstrap.jar:/usr/local/tomcat/bin/tomcat-juli.jar
+Using CATALINA_OPTS:   
+NOTE: Picked up JDK_JAVA_OPTIONS:  --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+05-Jul-2022 06:54:50.026 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/10.0.14
+[root@redis ~]# docker ps
+CONTAINER ID   IMAGE     COMMAND             CREATED          STATUS         PORTS                                       NAMES
+3bb416edc73c   tomcat    "catalina.sh run"   39 seconds ago   Up 3 seconds   0.0.0.0:8080->8080/tcp, :::8080->8080/tcp   tomcat01
+root@ed0e515aab4f:/usr/local/tomcat# cp -r webapps.dist/* webapps
+root@ed0e515aab4f:/usr/local/tomcat# cd webapps
+root@ed0e515aab4f:/usr/local/tomcat/webapps# ls
+ROOT  docs  examples  host-manager  manager
+[root@redis ~]# docker commit -a "bylv" -m "cp -r webapps.dist/* to webapps" tomcat01 tomcat01:1.0
+sha256:e492ff60035145e206e853f05cff0ee1cb3b0db7a02e99500d6fcee6d7e517ee
+[root@redis ~]# docker images
+REPOSITORY               TAG       IMAGE ID       CREATED          SIZE
+tomcat01                 1.0       e492ff600351   24 seconds ago   684MB
+tomcat                   latest    fb5657adc892   6 months ago     680MB
+```
