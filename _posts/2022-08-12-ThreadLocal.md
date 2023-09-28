@@ -286,10 +286,10 @@ public class TianLuoThreadLocalTest {
         Thread t = new Thread(new Runnable(){
             public void run(){
                 ThreadLocal<TianLuoDTO> threadLocal1 = new ThreadLocal<>();
-                threadLocal1.set(new TianLuoDTO("公众号：捡田螺的小男孩"));
+                threadLocal1.set(new TianLuoDTO("Hello,byLv"));
                 System.out.println(threadLocal1.get());
                 ThreadLocal<TianLuoDTO> threadLocal2 = new ThreadLocal<>();
-                threadLocal2.set(new TianLuoDTO("公众号：程序员田螺"));
+                threadLocal2.set(new TianLuoDTO("Hello"));
                 System.out.println(threadLocal2.get());
             }});
         t.start();
@@ -297,8 +297,8 @@ public class TianLuoThreadLocalTest {
 
 }
 //运行结果
-TianLuoDTO{name='公众号：捡田螺的小男孩'}
-TianLuoDTO{name='公众号：程序员田螺'}
+TianLuoDTO{name='Hello,byLv'}
+TianLuoDTO{name='Hello'}
 ```
 
 再对比下这个图，可能就更清晰一点啦：
