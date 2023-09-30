@@ -131,7 +131,8 @@ comments:
     clientSecret: 6e056b575b90c834d5f872d3bc60a0270e9eb762 # GitHub Application Client Secret
     repository  : comments # GitHub repo
     owner       : lvLiu-kun # GitHub repo owner
-    admin: lvLiu-kun # GitHub repo owner and collaborators, only these guys can initialize GitHub issues, IT IS A LIST.
+    admin: 
+      - lvLiu-kun # GitHub repo owner and collaborators, only these guys can initialize GitHub issues, IT IS A LIST.
       # - your GitHub Id
 
   ## Valine
