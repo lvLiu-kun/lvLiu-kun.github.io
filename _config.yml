@@ -20,7 +20,7 @@ text_skin: forest # "default" (default), "dark", "forest", "ocean", "chocolate",
 highlight_theme: default # "default" (default), "tomorrow", "tomorrow-night", "tomorrow-night-eighties", "tomorrow-night-blue", "tomorrow-night-bright"
 url     : # the base hostname & protocol for your site e.g. https://www.someone.com
 baseurl : # does not include hostname
-title   : blog bylv
+title   : blog byLv
 description: > # this means to ignore newlines until "Language & timezone"
   Your Site Description
 
@@ -35,7 +35,7 @@ timezone: # see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for
 ##############################
 author:
   type      : # "person" (default), "organization"
-  name      : 律柳_坤
+  name      : byLv
   url       :
   avatar    : https://bylv2727.oss-cn-shenzhen.aliyuncs.com/avatarImage/%E5%A4%B4%E5%83%8F.jpg # path or url of avatar image (square)
   bio       : 一位未出世的程序员
