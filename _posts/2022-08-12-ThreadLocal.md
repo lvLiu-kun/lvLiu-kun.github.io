@@ -1,5 +1,6 @@
 ---
 tags: Java ThreadLocal
+key: threadLocal-01
 ---
 
 # **工作以及面试中ThreadLocal的八个关键知识点**
