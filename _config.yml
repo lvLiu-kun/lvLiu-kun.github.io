@@ -127,8 +127,8 @@ comments:
   ## Gitalk
   # please refer to https://github.com/gitalk/gitalk for more info.
   gitalk:
-    clientID    : 979753e1446d39f03947 # GitHub Application Client ID
-    clientSecret: 6e056b575b90c834d5f872d3bc60a0270e9eb762 # GitHub Application Client Secret
+    clientID    : 02cf0fe9438b22b7c381 # GitHub Application Client ID
+    clientSecret: 0874db193efa05ccbed9a7c7017b5acefe26856d # GitHub Application Client Secret
     repository  : comments # GitHub repo
     owner       : lvLiu-kun # GitHub repo owner
     admin: 
