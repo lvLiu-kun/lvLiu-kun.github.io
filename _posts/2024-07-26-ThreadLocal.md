@@ -21,7 +21,7 @@ https://www.bilibili.com/video/BV1GP41157xr?spm_id_from=333.337.search-card.all.
 ## 作用
 
 实现线程之间的数据隔离（核心应用），每个线程拥有的都是独立的数据；
-实现当前线程的全局变量共享，可以直接通过 ThreadLocal 取，避免了传参。
+实现当前线程的全局变量共享，可以把数据存到 ThreadLocal 里面，进行上下游传递，避免了传参。
 例子：
 如何使用 ThreadLocal 来达到多线程的数据隔离呢？
 在 Spring Web项目中，通常会把业务分成 Controller、Service、Dao 等等，也知道注解 @Autowired 默认使用单例模式。那有没有想过，当不同的请求线程进来后，因为Dao 层使用的是单例，即负责连接数据库的 Connection 也只有一个，如果这些线程都去连接数据库的话，会造成线程不安全的问题，Spring是怎样来解决的呢？
