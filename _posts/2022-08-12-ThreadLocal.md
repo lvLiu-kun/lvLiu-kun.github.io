@@ -570,19 +570,19 @@ To help deal with very large and long-lived usages, the hash table entries use W
 - 一种就是，使用完`ThreadLocal`，手动调用`remove()`，把`Entry从ThreadLocalMap`中删除
 - 另外一种方式就是：`ThreadLocalMap`的自动清除机制去清除过期`Entry`.（`ThreadLocalMap`的`get(),set()`时都会触发对过期`Entry`的清除）
 
-## **7. InheritableThreadLocal保证父子线程间的共享数据**
+## 7. InheritableThreadLocal 保证父子线程间的共享数据
 
-我们知道`ThreadLocal`是线程隔离的，如果我们希望父子线程共享数据，如何做到呢？可以使用`InheritableThreadLocal`。先来看看`demo`：
+我们知道`ThreadLocal`是线程隔离的，如果我们希望父子线程共享数据，如何做到呢？可以使用`InheritableThreadLocal`，demo 如下：
 
-```
+```java
 public class InheritableThreadLocalTest {
 
    public static void main(String[] args) {
        ThreadLocal<String> threadLocal = new ThreadLocal<>();
        InheritableThreadLocal<String> inheritableThreadLocal = new InheritableThreadLocal<>();
 
-       threadLocal.set("关注公众号：捡田螺的小男孩");
-       inheritableThreadLocal.set("关注公众号：程序员田螺");
+       threadLocal.set("关注公众号：byLv");
+       inheritableThreadLocal.set("关注公众号：程序员 byLv");
 
        Thread thread = new Thread(()->{
            System.out.println("ThreadLocal value " + threadLocal.get());
@@ -592,6 +592,7 @@ public class InheritableThreadLocalTest {
        
    }
 }
+
 //运行结果
 ThreadLocal value null
 InheritableThreadLocal value 关注公众号：程序员田螺
@@ -599,20 +600,20 @@ InheritableThreadLocal value 关注公众号：程序员田螺
 
 可以发现，在子线程中，是可以获取到父线程的 `InheritableThreadLocal `类型变量的值，但是不能获取到 `ThreadLocal `类型变量的值。
 
-获取不到`ThreadLocal `类型的值，很好理解，因为它是线程隔离的嘛。`InheritableThreadLocal `是如何做到的呢？原理是什么呢？
+获取不到 `ThreadLocal` 类型的值，很好理解，因为它是线程隔离的嘛。`InheritableThreadLocal` 是如何做到的呢？原理是什么呢？
 
 在`Thread`类中，除了成员变量`threadLocals`之外，还有另一个成员变量：`inheritableThreadLocals`。它们两类型是一样的：
 
-```
+```java
 public class Thread implements Runnable {
    ThreadLocalMap threadLocals = null;
    ThreadLocalMap inheritableThreadLocals = null;
  }
 ```
 
-`Thread`类的`init`方法中，有一段初始化设置：
+`Thread` 类的 `init` 方法中，有一段初始化设置：
 
-```
+```java
  private void init(ThreadGroup g, Runnable target, String name,
                       long stackSize, AccessControlContext acc,
                       boolean inheritThreadLocals) {
@@ -632,23 +633,63 @@ public class Thread implements Runnable {
     }
 ```
 
-可以发现，当`parent的inheritableThreadLocals`不为`null`时，就会将`parent`的`inheritableThreadLocals`，赋值给前线程的`inheritableThreadLocals`。说白了，就是如果当前线程的`inheritableThreadLocals`不为`null`，就从父线程哪里拷贝过来一个过来，类似于另外一个`ThreadLocal`，数据从父线程那里来的。有兴趣的小伙伴们可以在去研究研究源码~
+可以发现，当父线程的 `inheritableThreadLocals` 不为 null 时，就会将赋值给前线程的`inheritableThreadLocals`。
 
 ## **8. ThreadLocal的应用场景和使用注意点**
 
-`ThreadLocal`的**很重要一个注意点**，就是使用完，要手动调用`remove()`。
+`ThreadLocal`的**很重要一个注意点**，就是使用完，要手动调用 remove()。
 
 而`ThreadLocal`的应用场景主要有以下这几种：
 
 - 使用日期工具类，当用到`SimpleDateFormat`，使用ThreadLocal保证线性安全
+
 - 全局存储用户信息（用户信息存入`ThreadLocal`，那么当前线程在任何地方需要时，都可以使用）
+
 - 保证同一个线程，获取的数据库连接`Connection`是同一个，使用`ThreadLocal`来解决线程安全的问题
-- 使用`MDC`保存日志信息。
+
+- ```java
+  public class LogContext {
+      private static final ThreadLocal<StringBuilder> logThreadLocal = ThreadLocal.withInitial(StringBuilder::new);
+  
+      public static void addLog(String log) {
+          logThreadLocal.get().append(log).append("\n");
+      }
+  
+      public static String getLog() {
+          return logThreadLocal.get().toString();
+      }
+  
+      public static void clearLog() {
+          logThreadLocal.remove();
+      }
+  }
+  
+  public class ExampleService {
+      public void process() {
+          try {
+              LogContext.addLog("Start processing");
+              // ...（业务逻辑代码）
+              LogContext.addLog("Processing finished successfully");
+          } catch (Exception e) {
+              LogContext.addLog("Processing failed: " + e.getMessage());
+          } finally {
+              String log = LogContext.getLog();
+              System.out.println("Thread log: " + log);
+              LogContext.clearLog(); // 清除当前线程的日志
+          }
+      }
+  }
+  ```
+
+  
 
 ### 参考资料
 
-[1]彻底理解ThreadLocal: *https://www.cnblogs.com/xzwblog/p/7227509.html*
+[1]彻底理解ThreadLocal：
+https://www.cnblogs.com/xzwblog/p/7227509.html
 
-[2]ThreadLocal是如何导致内存泄漏的: *https://zhuanlan.zhihu.com/p/346291694*
+[2]ThreadLocal是如何导致内存泄漏的：
+https://zhuanlan.zhihu.com/p/346291694
 
-[3]深入分析 ThreadLocal 内存泄漏问题: *https://www.jianshu.com/p/1342a879f523*
+[3]深入分析 ThreadLocal 内存泄漏问题：
+https://www.jianshu.com/p/1342a879f523
