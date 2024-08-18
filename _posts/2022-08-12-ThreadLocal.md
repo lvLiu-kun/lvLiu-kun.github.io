@@ -633,7 +633,7 @@ public class Thread implements Runnable {
     }
 ```
 
-可以发现，当父线程的 `inheritableThreadLocals` 不为 null 时，就会将赋值给前线程的`inheritableThreadLocals`。
+可以发现，当父线程的 `inheritableThreadLocals` 不为 null 时，就会把它赋值给前线程的`inheritableThreadLocals`。
 
 ## **8. ThreadLocal的应用场景和使用注意点**
 
@@ -641,13 +641,15 @@ public class Thread implements Runnable {
 
 而`ThreadLocal`的应用场景主要有以下这几种：
 
-- 使用日期工具类，当用到`SimpleDateFormat`，使用ThreadLocal保证线性安全
+- 使用日期工具类，当用到`SimpleDateFormat`，使用ThreadLocal保证线性安全；
 
-- 全局存储用户信息（用户信息存入`ThreadLocal`，那么当前线程在任何地方需要时，都可以使用）
+- 全局存储用户信息（用户信息存入`ThreadLocal`，那么当前线程在任何地方需要时，都可以使用）；
 
-- 保证同一个线程，获取的数据库连接`Connection`是同一个，使用`ThreadLocal`来解决线程安全的问题
+- 保证同一个线程，获取的数据库连接`Connection`是同一个，使用`ThreadLocal`来解决线程安全的问题；
 
-- ```java
+- 保存上下文日志信息：
+  
+  ```java
   public class LogContext {
       private static final ThreadLocal<StringBuilder> logThreadLocal = ThreadLocal.withInitial(StringBuilder::new);
   
@@ -678,9 +680,9 @@ public class Thread implements Runnable {
               LogContext.clearLog(); // 清除当前线程的日志
           }
       }
-  }
+}
   ```
-
+  
   
 
 ### 参考资料

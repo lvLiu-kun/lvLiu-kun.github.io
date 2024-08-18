@@ -62,7 +62,7 @@ static 修饰符。
 
 ## InheritableThreadLocal
 
-继承 ThreadLocal，可以实现父子线程间的数据共享，当创建一个子线程时，子线程会继承父线程的值。
+继承 ThreadLocal，可以实现父子线程间的数据共享，当创建一个子线程时，如果父线程的 inheritableThreadLocals 不为 null，就会把它赋值给子线程的 inheritableThreadLocals。
 
-有什么潜在问题？如果父线程在子线程启动后修改了值，子线程是感知不到的，会导致数据不一致。
+有什么潜在问题？如果这个值被修改了，其他线程也会受到影响，所以可能会引发并发问题导致数据不一致。
 
